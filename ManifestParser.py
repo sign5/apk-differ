@@ -10,9 +10,7 @@ class ManifestParser:
     namespaces = {'android': 'http://schemas.android.com/apk/res/android'}
 
     @staticmethod
-    def parse_xml(path):
-        xml_tree = ET.parse(path)
-        root = xml_tree.getroot()
+    def process_xml(root):
         manifest = Manifest()
         for key in manifest.__dict__.keys():
             if type(getattr(manifest, key)) is not list:
@@ -31,6 +29,17 @@ class ManifestParser:
         manifest.uses_permissions_sdk_23 = ManifestParser.get_uses_permission_sdk_23(root)
         manifest.uses_sdk = ManifestParser.get_uses_sdk(root)
         return manifest
+
+    @staticmethod
+    def parse_xml(xml_path):
+        xml_tree = ET.parse(xml_path)
+        root = xml_tree.getroot()
+        return ManifestParser.process_xml(root)
+
+    @staticmethod
+    def parse_string(xml_string):
+        root = ET.fromstring(xml_string)
+        return ManifestParser.process_xml(root)
 
     @staticmethod
     def get_application(root):

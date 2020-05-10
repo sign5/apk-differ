@@ -1,5 +1,4 @@
-import collections
-from functools import reduce
+import hashlib
 
 from DictDiffer import DictDiffer
 
@@ -14,7 +13,7 @@ class Tags:
     data = "data"
     grant_uri_permission = "grant-uri-permission"
     instrumentation = "instrumentation"
-    intent_filter = "intent_filter"
+    intent_filter = "intent-filter"
     layout = "layout"
     manifest = "manifest"
     meta_data = "meta-data"
@@ -39,6 +38,7 @@ class Tags:
 def object_list_hash(prev, next):
     return hash(prev) + hash(next)
 
+
 class Action:
     def __init__(self):
         self.name = ""  # "string"
@@ -48,15 +48,23 @@ class Action:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, Action) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Activity:
@@ -78,7 +86,7 @@ class Activity:
         self.hardwareAccelerated = ""  # ["true" | "false"]
         self.icon = ""  # "drawable resource"
         self.immersive = ""  # ["true" | "false"]
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.launchMode = ""  # ["standard" | "singleTop" | "singleTask" | "singleInstance"]
         self.lockTaskMode = ""  # ["normal" | "never" | "if_whitelisted" | "always"]
         self.maxRecents = ""  # "integer"
@@ -97,7 +105,7 @@ class Activity:
         self.stateNotNeeded = ""  # ["true" | "false"]
         self.supportsPictureInPicture = ""  # ["true" | "false"]
         self.taskAffinity = ""  # "string"
-        self.theme = ""  # "resource or theme"
+        # self.theme = ""  # "resource or theme"
         self.uiOptions = ""  # ["none" | "splitActionBarWhenNarrow"]
         self.windowSoftInputMode = ""  # ["stateUnspecified", "stateUnchanged", "stateHidden", "stateAlwaysHidden", "stateVisible", "stateAlwaysVisible", "adjustUnspecified", "adjustResize", "adjustPan"]
         self.layout = None
@@ -118,13 +126,20 @@ class Activity:
         return not self.__eq__(other)
 
     def __hash__(self):
-        # TODO
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-
-        hash_of_intent_filters = reduce(object_list_hash, self.intent_filters)
-        print(hash_of_intent_filters)
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, manifest_classes):
+                    if isinstance(field_value, list):
+                        for item in field_value:
+                            h.update(str(hash(item)).encode('utf-8'))
+                    else:
+                        h.update(str(hash(field_value)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class ActivityAlias:
@@ -132,7 +147,7 @@ class ActivityAlias:
         self.enabled = ""  # "" # ["true" | "false"]
         self.exported = ""  # "" # ["true" | "false"]
         self.icon = ""  # "drawable resource"
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.name = ""  # "string"
         self.permission = ""  # "string"
         self.targetActivity = ""  # "string"
@@ -152,10 +167,17 @@ class ActivityAlias:
         return not self.__eq__(other)
 
     def __hash__(self):
-        # TODO
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Application:
@@ -181,7 +203,7 @@ class Application:
         self.isGame = ""  # ["true" | "false"]
         self.killAfterRestore = ""  # ["true" | "false"]
         self.largeHeap = ""  # ["true" | "false"]
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.logo = ""  # "drawable resource"
         self.manageSpaceActivity = ""  # "string"
         self.name = ""  # "string"
@@ -197,7 +219,7 @@ class Application:
         self.supportsRtl = ""  # ["true" | "false"]
         self.taskAffinity = ""  # "string"
         self.testOnly = ""  # ["true" | "false"]
-        self.theme = ""  # "resource or theme"
+        # self.theme = ""  # "resource or theme"
         self.uiOptions = ""  # ["none" | "splitActionBarWhenNarrow"]
         self.usesCleartextTraffic = ""  # ["true" | "false"]
         self.vmSafeMode = ""  # ["true" | "false"]
@@ -225,10 +247,17 @@ class Application:
         return not self.__eq__(other)
 
     def __hash__(self):
-        # TODO
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Category:
@@ -240,15 +269,23 @@ class Category:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, Category) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class CompatibleScreens:
@@ -266,10 +303,17 @@ class CompatibleScreens:
         return not self.__eq__(other)
 
     def __hash__(self):
-        # TODO
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Data:
@@ -287,15 +331,23 @@ class Data:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, Data) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class GrantUriPermission:
@@ -309,15 +361,23 @@ class GrantUriPermission:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, GrantUriPermission) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Instrumentation:
@@ -325,7 +385,7 @@ class Instrumentation:
         self.functionalTest = ""  # ["true" | "false"]
         self.handleProfiling = ""  # ["true" | "false"]
         self.icon = ""  # "drawable resource"
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.name = ""  # "string"
         self.targetPackage = ""  # "string"
         self.targetProcesses = ""  # "string"
@@ -335,21 +395,29 @@ class Instrumentation:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, Instrumentation) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class IntentFilter:
     def __init__(self):
         self.icon = ""  # "drawable resource"
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.priority = ""  # "integer"
 
         self.actions = []
@@ -369,10 +437,17 @@ class IntentFilter:
         return not self.__eq__(other)
 
     def __hash__(self):
-        # TODO
-        not_none_items = filter(lambda x: (x[1] is not None) and (isinstance(x[1], list)), self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Layout:
@@ -387,15 +462,23 @@ class Layout:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, Layout) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Manifest:
@@ -440,10 +523,17 @@ class Manifest:
         return not self.__eq__(other)
 
     def __hash__(self):
-        # TODO
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class MetaData:
@@ -457,15 +547,23 @@ class MetaData:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, MetaData) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class PathPermission:
@@ -482,22 +580,30 @@ class PathPermission:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, PathPermission) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Permission:
     def __init__(self):
-        self.description = ""  # "string resource"
+        # self.description = ""  # "string resource"
         self.icon = ""  # "drawable resource"
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.name = ""  # "string"
         self.permissionGroup = ""  # "string"
         self.protectionLevel = ""  # ["normal" | "dangerous" | "signature" | ...]
@@ -507,21 +613,29 @@ class Permission:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, Permission) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class PermissionGroup:
     def __init__(self):
         self.name = ""  # "string"
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.description = ""  # "string resource"
         self.icon = ""  # "drawable resource"
 
@@ -530,21 +644,29 @@ class PermissionGroup:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, PermissionGroup) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class PermissionTree:
     def __init__(self):
         self.name = ""  # "string"
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.icon = ""  # "drawable resource"
 
     def __str__(self):
@@ -552,15 +674,23 @@ class PermissionTree:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, PermissionTree) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Provider:
@@ -572,7 +702,7 @@ class Provider:
         self.grantUriPermissions = ""  # "" # ["true" | "false"]
         self.icon = ""  # "drawable resource"
         self.initOrder = ""  # "integer"
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.multiprocess = ""  # "" # ["true" | "false"]
         self.name = ""  # "string"
         self.permission = ""  # "string"
@@ -590,7 +720,7 @@ class Provider:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return (other is not None) and isinstance(other, ActivityAlias) and (self.meta_datas == other.meta_datas) and \
+        return (other is not None) and isinstance(other, Provider) and (self.meta_datas == other.meta_datas) and \
                (self.grant_uri_permissions == other.grant_uri_permissions) and \
                (self.path_permissions == other.path_permissions) and DictDiffer(self, other).equal_excl_lists()
 
@@ -598,10 +728,17 @@ class Provider:
         return not self.__eq__(other)
 
     def __hash__(self):
-        # TODO
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Receiver:
@@ -610,7 +747,7 @@ class Receiver:
         self.enabled = ""  # ["true" | "false"]
         self.exported = ""  # ["true" | "false"]
         self.icon = ""  # "drawable resource"
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.name = ""  # "string"
         self.permission = ""  # "string"
         self.process = ""  # "string"
@@ -623,17 +760,24 @@ class Receiver:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return (other is not None) and isinstance(other, ActivityAlias) and (self.meta_datas == other.meta_datas) and \
+        return (other is not None) and isinstance(other, Receiver) and (self.meta_datas == other.meta_datas) and \
                (self.intent_filters == other.intent_filters) and DictDiffer(self, other).equal_excl_lists()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        # TODO
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Screen:
@@ -646,15 +790,23 @@ class Screen:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, Screen) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class Service:
@@ -666,7 +818,7 @@ class Service:
         self.foregroundServiceType = ""  # ["connectedDevice" | "dataSync" | "location" | "mediaPlayback" | "mediaProjection" | "phoneCall"]
         self.icon = ""  # "drawable resource"
         self.isolatedProcess = ""  # ["true" | "false"]
-        self.label = ""  # "string resource"
+        # self.label = ""  # "string resource"
         self.name = ""  # "string"
         self.permission = ""  # "string"
         self.process = ""  # "string"
@@ -679,17 +831,24 @@ class Service:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return (other is not None) and isinstance(other, ActivityAlias) and (self.meta_datas == other.meta_datas) and \
+        return (other is not None) and isinstance(other, Service) and (self.meta_datas == other.meta_datas) and \
                (self.intent_filters == other.intent_filters) and DictDiffer(self, other).equal_excl_lists()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        # TODO
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class SupportsGlTexture:
@@ -701,15 +860,23 @@ class SupportsGlTexture:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, SupportsGlTexture) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class SupportsScreens:
@@ -729,15 +896,23 @@ class SupportsScreens:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, SupportsScreens) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class UsesConfiguration:
@@ -753,15 +928,23 @@ class UsesConfiguration:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, UsesConfiguration) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class UsesFeature:
@@ -775,15 +958,23 @@ class UsesFeature:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, UsesFeature) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class UsesLibrary:
@@ -796,15 +987,23 @@ class UsesLibrary:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, UsesLibrary) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class UsesPermission:
@@ -817,15 +1016,23 @@ class UsesPermission:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, UsesPermission) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class UsesPermissionSdk23:
@@ -838,15 +1045,23 @@ class UsesPermissionSdk23:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, UsesPermissionSdk23) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
 
 
 class UsesSdk:
@@ -860,12 +1075,27 @@ class UsesSdk:
         return dict_wo_nones.__str__()
 
     def __eq__(self, other):
-        return DictDiffer(self, other).equal()
+        return (other is not None) and isinstance(other, UsesSdk) and DictDiffer(self, other).equal()
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def __hash__(self):
-        not_none_items = filter(lambda x: x[1] is not None, self.__dict__.items())
-        od = collections.OrderedDict(sorted(not_none_items))
-        return hash(''.join(list(od.values())))
+        h = hashlib.sha256()
+        data = dict(sorted(self.__dict__.items()))
+        for key in data:
+            field_value = data[key]
+            if field_value is not None:
+                if isinstance(field_value, list):
+                    for item in field_value:
+                        h.update(str(hash(item)).encode('utf-8'))
+                else:
+                    h.update(field_value.encode('utf-8'))
+        return int(h.hexdigest(), 16)
+
+
+manifest_classes = (
+    Action, Activity, ActivityAlias, Application, Category, CompatibleScreens, Data, GrantUriPermission,
+    Instrumentation, IntentFilter, Layout, Manifest, MetaData, PathPermission, Permission, PermissionGroup,
+    PermissionTree, Provider, Receiver, Screen, Service, SupportsGlTexture, SupportsScreens, Tags, UsesConfiguration,
+    UsesFeature, UsesLibrary, UsesPermission, UsesPermissionSdk23, UsesSdk, list)

@@ -28,6 +28,6 @@ class DictDiffer(object):
         return len(self.added() | self.removed() | self.changed()) == 0
 
     def equal_excl_lists(self):
-        curr_dict_entries_which_not_lists = sorted(filter(lambda x: type(x[1]) is str, self.curr_dict.items()))
-        past_dict_entries_which_not_lists = sorted(filter(lambda x: type(x[1]) is str, self.past_dict.items()))
-        return curr_dict_entries_which_not_lists == past_dict_entries_which_not_lists
+        past_dict_entries_which_not_lists = dict(sorted(filter(lambda x: type(x[1]) is str, self.past_dict.items())))
+        curr_dict_entries_which_not_lists = dict(sorted(filter(lambda x: type(x[1]) is str, self.curr_dict.items())))
+        return past_dict_entries_which_not_lists == curr_dict_entries_which_not_lists
