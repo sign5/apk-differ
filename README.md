@@ -24,4 +24,6 @@ pip3 install -r requirements.txt
 
 # Usage example:
 
-`python3 main.py <path-to-old-apk-file> <path-to-new-apk-file>`
+```
+python3 main.py <path-to-old-apk-file> <path-to-new-apk-file>
+```
