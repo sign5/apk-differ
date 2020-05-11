@@ -8,15 +8,14 @@ Manifest Differ
 
 [python3-versions-label]: https://img.shields.io/badge/python-3.8.2-green.svg
 [python3-versions-link]: https://www.python.org/downloads/release/python-382/
-[license-label]: https://img.shields.io/github/license/sign5/apk-differ
-[license-link]: https://github.com/sign5/apk-differ/blob/master/LICENSE
+[license-label]: https://img.shields.io/badge/license-MIT-green
+[license-link]: https://github.com/sign5/apk-differ/blob/master/LICENSE.md
 [version-label]: https://img.shields.io/badge/version-0.1-brightgreen
 [stability-label]: https://img.shields.io/badge/stability-experimental-red
 
 
 # Install
 
-## Linux based OS install:
 ```
 git clone https://github.com/sign5/apk-differ && cd ./apk-differ
 pip3 install -r requirements.txt
