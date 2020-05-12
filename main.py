@@ -15,7 +15,7 @@ def get_manifest_from_apk(apk_path):
 
 
 def main(args):
-    files = vars(args_namespace)['file']
+    files = vars(args)['file']
     old_path, new_path = files
     old_manifest = get_manifest_from_apk(old_path) if old_path.endswith("apk") else ManifestParser.parse_xml(old_path)
     new_manifest = get_manifest_from_apk(new_path) if new_path.endswith("apk") else ManifestParser.parse_xml(new_path)
